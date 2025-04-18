@@ -5,4 +5,5 @@ locals {
   wait_for_ready   = true
 
   grafana_chart_version = "8.11.4"
+  loki_chart_version    = "6.29.0"
 }
