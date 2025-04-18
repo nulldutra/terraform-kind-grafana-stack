@@ -26,6 +26,14 @@ Open source tools designed for monitoring, observability, and visualization.
 terraform init && terraform apply
 ```
 
+## Accessing cluster
+
+We need to set the environment variable `KUBECONFIG` to point to the config.
+
+```sh
+export KUBECONFIG=/tmp/kind-config
+```
+
 ## Accessing applications
 
 ### Grafana
