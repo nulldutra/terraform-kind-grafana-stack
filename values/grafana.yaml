@@ -22,3 +22,15 @@ datasources:
           isDefault: false
           version: 1
           editable: false
+
+        - name: Tempo
+          type: tempo
+          access: proxy
+          orgId: 1
+          url: http://tempo.tempo.svc.cluster.local:3100
+          basicAuth: false
+          isDefault: true
+          version: 1
+          editable: false
+          apiVersion: 1
+          uid: tempo

@@ -21,6 +21,18 @@ resource "kind_cluster" "default" {
   }
 }
 
+resource "helm_release" "loki" {
+  name             = "loki"
+  repository       = "https://grafana.github.io/helm-charts"
+  chart            = "loki"
+  create_namespace = true
+  namespace        = "loki"
+  version          = local.loki_chart_version
+  values           = [file("${path.module}/values/loki.yaml")]
+
+  depends_on = [kind_cluster.default]
+}
+
 resource "helm_release" "grafana" {
   name             = "grafana"
   repository       = "https://grafana.github.io/helm-charts"
@@ -33,14 +45,14 @@ resource "helm_release" "grafana" {
   depends_on = [kind_cluster.default]
 }
 
-resource "helm_release" "loki" {
-  name             = "loki"
+resource "helm_release" "tempo" {
+  name             = "tempo"
   repository       = "https://grafana.github.io/helm-charts"
-  chart            = "loki"
+  chart            = "tempo"
   create_namespace = true
-  namespace        = "loki"
-  version          = local.loki_chart_version
-  values           = [file("${path.module}/values/loki.yaml")]
+  namespace        = "tempo"
+  version          = local.tempo_chart_version
+  values           = [file("${path.module}/values/tempo.yaml")]
 
   depends_on = [kind_cluster.default]
 }

@@ -1,14 +1,13 @@
-## Grafana LGTM
+## Grafana stack
 
 Open source tools designed for monitoring, observability, and visualization.
 
-* [L]oki
+* Loki
 
-* [G]rafana
+* Grafana
 
-* [T]empo
+* Tempo
 
-* [M]imir
 
 <hr>
 
