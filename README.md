@@ -26,3 +26,10 @@ Open source tools designed for monitoring, observability, and visualization.
 terraform init && terraform apply
 ```
 
+## Accessing applications
+
+### Grafana
+
+```sh
+kubectl port-forward -n grafana svc/grafana 3000:80
+```

@@ -8,3 +8,9 @@ terraform {
 }
 
 provider "kind" {}
+
+provider "helm" {
+  kubernetes {
+    config_path = pathexpand("/tmp/kind-config")
+  }
+}

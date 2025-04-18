@@ -1,0 +1,24 @@
+persistence:
+  type: pvc
+  enabled: false
+
+adminUser: Admin
+adminPassword: admin
+
+service:
+  enabled: true
+  type: ClusterIP
+
+datasources:
+  datasources.yaml:
+        apiVersion: 1
+        datasources:
+        - name: Loki
+          type: loki
+          access: proxy
+          orgId: 1
+          url: http://loki.grafana-loki.svc.cluster.local:3100
+          basicAuth: false
+          isDefault: false
+          version: 1
+          editable: false

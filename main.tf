@@ -1,7 +1,8 @@
 resource "kind_cluster" "default" {
-  name           = local.cluster_name
-  node_image     = local.node_image
-  wait_for_ready = local.wait_for_ready
+  name            = local.cluster_name
+  node_image      = local.node_image
+  wait_for_ready  = local.wait_for_ready
+  kubeconfig_path = pathexpand("/tmp/kind-config")
 
   kind_config {
     kind        = "Cluster"
@@ -18,4 +19,17 @@ resource "kind_cluster" "default" {
       role = "worker"
     }
   }
+}
+
+
+resource "helm_release" "grafana" {
+  name             = "grafana"
+  repository       = "https://grafana.github.io/helm-charts"
+  chart            = "grafana"
+  create_namespace = true
+  namespace        = "grafana"
+  version          = local.grafana_chart_version
+  values           = [file("${path.module}/values/grafana.yaml")]
+
+  depends_on = [kind_cluster.default]
 }
