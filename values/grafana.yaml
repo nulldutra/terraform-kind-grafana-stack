@@ -17,7 +17,7 @@ datasources:
           type: loki
           access: proxy
           orgId: 1
-          url: http://loki.grafana-loki.svc.cluster.local:3100
+          url: http://loki.loki.svc.cluster.local:3100
           basicAuth: false
           isDefault: false
           version: 1
