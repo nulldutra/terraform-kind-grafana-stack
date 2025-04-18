@@ -7,4 +7,5 @@ locals {
   grafana_chart_version = "8.11.4"
   loki_chart_version    = "6.29.0"
   tempo_chart_version   = "1.20.0"
+  alloy_chart_version   = "1.0.1"
 }

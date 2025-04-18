@@ -56,3 +56,16 @@ resource "helm_release" "tempo" {
 
   depends_on = [kind_cluster.default]
 }
+
+
+resource "helm_release" "alloy" {
+  name             = "alloy"
+  repository       = "https://grafana.github.io/helm-charts"
+  chart            = "alloy"
+  create_namespace = true
+  namespace        = "alloy"
+  version          = local.alloy_chart_version
+  values           = [file("${path.module}/values/alloy.yaml")]
+
+  depends_on = [kind_cluster.default]
+}

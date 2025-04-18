@@ -1,0 +1,292 @@
+nameOverride: null
+
+namespaceOverride: null
+
+fullnameOverride: null
+
+global:
+  image:
+    registry: ""
+    pullSecrets: []
+
+  podSecurityContext: {}
+
+crds:
+  create: true
+
+alloy:
+  configMap:
+    create: true
+    content: |-
+      loki.write "default" {
+        endpoint {
+          url = "http://loki.loki.svc.cluster.local:3100/loki/api/v1/push"
+        }
+      }
+
+      discovery.kubernetes "pod" {
+        role = "pod"
+      }
+
+      discovery.relabel "pod_logs" {
+        targets = discovery.kubernetes.pod.targets
+
+        rule {
+          source_labels = ["__meta_kubernetes_namespace"]
+          action = "replace"
+          target_label = "namespace"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_name"]
+          action = "replace"
+          target_label = "pod"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_name"]
+          action = "replace"
+          target_label = "container"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+          action = "replace"
+          target_label = "app"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_container_name"]
+          action = "replace"
+          target_label = "job"
+          separator = "/"
+          replacement = "$1"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
+          action = "replace"
+          target_label = "__path__"
+          separator = "/"
+          replacement = "/var/log/pods/*$1/*.log"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_id"]
+          action = "replace"
+          target_label = "container_runtime"
+          regex = "^(\\S+):\\/\\/.+$"
+          replacement = "$1"
+        }
+      }
+
+      loki.source.kubernetes "pod_logs" {
+        targets    = discovery.relabel.pod_logs.output
+        forward_to = [loki.process.pod_logs.receiver]
+      }
+
+      loki.process "pod_logs" {
+        stage.static_labels {
+            values = {
+              cluster = sys.env("CLUSTER"),
+            }
+        }
+
+        forward_to = [loki.write.default.receiver]
+      }
+
+    name: null
+    key: null
+
+  clustering:
+    enabled: false
+    name: ""
+    portName: http
+
+  stabilityLevel: "generally-available"
+  storagePath: /tmp/alloy
+  listenAddr: 0.0.0.0
+  listenPort: 12345
+  listenScheme: HTTP
+  uiPathPrefix: /
+  enableReporting: true
+  extraEnv: []
+  envFrom: []
+  extraArgs: []
+  extraPorts: []
+  hostAliases: []
+  mounts:
+    varlog: false
+    dockercontainers: false
+    extra: []
+
+  securityContext: {}
+  resources: {}
+
+  lifecycle: {}
+  livenessProbe: {}
+
+image:
+  registry: "docker.io"
+  repository: grafana/alloy
+  tag: null
+  digest: null
+  pullPolicy: IfNotPresent
+  pullSecrets: []
+
+rbac:
+  create: true
+
+serviceAccount:
+  create: true
+  additionalLabels: {}
+  annotations: {}
+  name: null
+  automountServiceAccountToken: true
+
+configReloader:
+  enabled: true
+  image:
+    registry: "quay.io"
+    repository: prometheus-operator/prometheus-config-reloader
+    tag: v0.81.0
+    digest: ""
+  customArgs: []
+  resources:
+    requests:
+      cpu: "10m"
+      memory: "50Mi"
+  securityContext: {}
+
+controller:
+  type: 'daemonset'
+  replicas: 1
+  extraAnnotations: {}
+  parallelRollout: true
+  hostNetwork: false
+  hostPID: false
+  dnsPolicy: ClusterFirst
+  terminationGracePeriodSeconds: null
+  updateStrategy: {}
+  nodeSelector: {}
+  tolerations: []
+  topologySpreadConstraints: []
+  priorityClassName: ''
+  podAnnotations: {}
+  podLabels: {}
+
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: null
+    maxUnavailable: null
+
+  enableStatefulSetAutoDeletePVC: false
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 0
+    targetMemoryUtilizationPercentage: 80
+
+    scaleDown:
+      policies: []
+      selectPolicy: Max
+      stabilizationWindowSeconds: 300
+
+    scaleUp:
+      policies: []
+      selectPolicy: Max
+      stabilizationWindowSeconds: 0
+
+    horizontal:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 5
+      targetCPUUtilizationPercentage: 0
+      targetMemoryUtilizationPercentage: 80
+
+      scaleDown:
+        policies: []
+        selectPolicy: Max
+        stabilizationWindowSeconds: 300
+
+      scaleUp:
+        policies: []
+        selectPolicy: Max
+        stabilizationWindowSeconds: 0
+    vertical:
+      enabled: false
+      recommenders: []
+      resourcePolicy:
+        containerPolicies:
+        - containerName: alloy
+          controlledResources:
+          - cpu
+          - memory
+          controlledValues: "RequestsAndLimits"
+          maxAllowed: {}
+          minAllowed: {}
+
+      updatePolicy:
+
+service:
+  enabled: true
+  type: ClusterIP
+  nodePort: 31128
+  clusterIP: ''
+  internalTrafficPolicy: Cluster
+  annotations: {}
+
+serviceMonitor:
+  enabled: false
+  additionalLabels: {}
+  interval: ""
+  metricRelabelings: []
+  tlsConfig: {}
+
+  relabelings: []
+  # - sourceLabels: [__meta_kubernetes_pod_node_name]
+  #   separator: ;
+  #   regex: ^(.*)$
+  #   targetLabel: nodename
+  #   replacement: $1
+  #   action: replace
+
+ingress:
+  # -- Enables ingress for Alloy (Faro port)
+  enabled: false
+  # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+  # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
+  # ingressClassName: nginx
+  # Values can be templated
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  labels: {}
+  path: /
+  faroPort: 12347
+
+  # pathType is only for k8s >= 1.1=
+  pathType: Prefix
+
+  hosts:
+    - chart-example.local
+  ## Extra paths to prepend to every host configuration. This is useful when working with annotation based services.
+  extraPaths: []
+  # - path: /*
+  #   backend:
+  #     serviceName: ssl-redirect
+  #     servicePort: use-annotation
+  ## Or for k8s > 1.19
+  # - path: /*
+  #   pathType: Prefix
+  #   backend:
+  #     service:
+  #       name: ssl-redirect
+  #       port:
+  #         name: use-annotation
+
+  tls: []
+extraObjects: []
