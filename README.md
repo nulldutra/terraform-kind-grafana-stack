@@ -2,6 +2,8 @@
 
 Open source tools designed for monitoring, observability, and visualization.
 
+* Alloy
+
 * Loki
 
 * Grafana
