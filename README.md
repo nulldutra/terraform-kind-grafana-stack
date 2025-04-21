@@ -8,8 +8,9 @@ Open source tools designed for monitoring, observability, and visualization.
 
 * Grafana
 
-* Tempo
+* Prometheus
 
+* Tempo
 
 <hr>
 
