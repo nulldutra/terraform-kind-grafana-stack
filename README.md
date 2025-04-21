@@ -42,3 +42,9 @@ export KUBECONFIG=/tmp/kind-config
 ```sh
 kubectl port-forward -n grafana svc/grafana 3000:80
 ```
+
+### Prometheus
+
+```sh
+kubectl port-forward -n prometheus svc/prometheus-server 9090:80
+```

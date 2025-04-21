@@ -4,9 +4,9 @@ locals {
   node_image       = "kindest/node:v1.32.1"
   wait_for_ready   = true
 
-  grafana_chart_version       = "8.11.4"
-  loki_chart_version          = "6.29.0"
-  tempo_chart_version         = "1.20.0"
-  alloy_chart_version         = "1.0.1"
-  prometheus_chart_version    = "27.11.0"
+  grafana_chart_version    = "8.11.4"
+  loki_chart_version       = "6.29.0"
+  tempo_chart_version      = "1.20.0"
+  alloy_chart_version      = "1.0.1"
+  prometheus_chart_version = "27.11.0"
 }
