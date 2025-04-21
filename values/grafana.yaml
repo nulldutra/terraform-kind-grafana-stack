@@ -34,3 +34,15 @@ datasources:
           editable: false
           apiVersion: 1
           uid: tempo
+
+        - name: Prometheus
+          type: prometheus
+          access: proxy
+          orgId: 1
+          url: http://prometheus-server.prometheus.svc.cluster.local
+          basicAuth: false
+          isDefault: false
+          version: 1
+          editable: true
+          apiVersion: 1
+          uid: prometheus

@@ -57,7 +57,6 @@ resource "helm_release" "tempo" {
   depends_on = [kind_cluster.default]
 }
 
-
 resource "helm_release" "alloy" {
   name             = "alloy"
   repository       = "https://grafana.github.io/helm-charts"
@@ -66,6 +65,18 @@ resource "helm_release" "alloy" {
   namespace        = "alloy"
   version          = local.alloy_chart_version
   values           = [file("${path.module}/values/alloy.yaml")]
+
+  depends_on = [kind_cluster.default]
+}
+
+resource "helm_release" "prometheus" {
+  name             = "prometheus"
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "prometheus"
+  create_namespace = true
+  namespace        = "prometheus"
+  version          = local.prometheus_chart_version
+  values           = [file("${path.module}/values/prometheus.yaml")]
 
   depends_on = [kind_cluster.default]
 }
